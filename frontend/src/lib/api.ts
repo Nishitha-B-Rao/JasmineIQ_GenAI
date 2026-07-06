@@ -1,5 +1,4 @@
 const API_BASE = "http://localhost:8000/api"
-// const API_BASE = "https://jasmineiq-backend-586827445377.us-central1.run.app/api"
 
 export async function fetchDashboard(variety: string = "Mallige", todayPrice?: number) {
   let url = `${API_BASE}/dashboard?variety=${variety}`
