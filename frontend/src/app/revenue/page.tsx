@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { fetchRevenue } from "@/lib/api"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,11 @@ export default function RevenueCalculator() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    handleCalculate()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variety])
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">

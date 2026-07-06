@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { fetchAnalytics } from "@/lib/api"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { BarChart3, TrendingDown, TrendingUp, Activity, Leaf, AlertTriangle, MinusCircle, CheckCircle } from "lucide-react"
+import { BarChart3, TrendingDown, TrendingUp, Activity, Leaf, AlertTriangle, MinusCircle, CheckCircle, BrainCircuit } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 export default function AnalyticsPage() {
@@ -47,6 +47,21 @@ export default function AnalyticsPage() {
         </div>
       ) : data ? (
         <div className="space-y-8">
+          
+          {/* AI Insight Summary */}
+          <Card className="border-2 border-primary/20 bg-primary/5 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-bold flex items-center text-primary">
+                <BrainCircuit className="w-5 h-5 mr-2" /> AI Market Insight
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground font-medium leading-relaxed">
+                Based on historical data from BigQuery, Udupi Mallige exhibits significantly higher price ceilings (up to ₹{data.Mallige.max}) compared to Jaaji. Both varieties show {data.Mallige.volatility.toLowerCase()} volatility during the current season. Our model anticipates continued price fluctuations driven by upcoming local temple festivals and shifting weather patterns.
+              </p>
+            </CardContent>
+          </Card>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Mallige Card */}

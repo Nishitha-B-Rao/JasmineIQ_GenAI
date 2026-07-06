@@ -22,10 +22,12 @@ export default function AssistantPage() {
   ])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(true)
 
   const handleSend = async (text: string) => {
     if (!text.trim()) return
     
+    setShowSuggestions(false)
     setMessages(prev => [...prev, { role: 'user', text }])
     setInput("")
     setLoading(true)
@@ -76,18 +78,20 @@ export default function AssistantPage() {
         </CardContent>
         
         <div className="p-4 bg-card border-t border-muted">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {SUGGESTED_QUESTIONS.map((q, idx) => (
-              <button 
-                key={idx} 
-                onClick={() => handleSend(q)}
-                disabled={loading}
-                className="text-xs bg-secondary/30 hover:bg-secondary/60 text-secondary-foreground border border-secondary/50 rounded-full px-3 py-1.5 transition-colors"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
+          {showSuggestions && (
+            <div className="flex flex-wrap gap-2 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              {SUGGESTED_QUESTIONS.map((q, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => handleSend(q)}
+                  disabled={loading}
+                  className="text-xs bg-secondary/30 hover:bg-secondary/60 text-secondary-foreground border border-secondary/50 rounded-full px-3 py-1.5 transition-colors"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="flex items-center space-x-2">
             <Input 
               placeholder="Type your question here..." 

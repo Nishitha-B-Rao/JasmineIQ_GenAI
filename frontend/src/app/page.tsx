@@ -5,7 +5,7 @@ import { fetchDashboard } from "@/lib/api"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
-import { TrendingUp, CloudRain, ThermometerSun, Wind, AlertCircle } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, CloudRain, ThermometerSun, Wind, AlertCircle, Sun, CheckCircle2, Activity, BrainCircuit } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 export default function Dashboard() {
@@ -82,44 +82,81 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex flex-col items-center justify-center mb-6">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Expected Additional Income</p>
-                <p className={`text-5xl font-black ${data.expected_increase >= 0 ? "text-green-600" : "text-red-500"}`}>
-                  {data.expected_increase >= 0 ? "+" : ""}₹{data.expected_increase}
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">Tomorrow's Predicted Rate: ₹{data.tomorrow_price} / Atte</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                {/* Left Side: Core Numbers & Confidence */}
+                <div className="flex flex-col justify-center space-y-6">
+                  <div className="text-center md:text-left">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Expected Profit Difference</p>
+                    <p className={`text-5xl font-black ${data.expected_increase >= 0 ? "text-green-600" : "text-red-500"}`}>
+                      {data.expected_increase >= 0 ? "+" : ""}₹{data.expected_increase}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">Tomorrow's Predicted Rate: <span className="font-bold text-foreground">₹{data.tomorrow_price}</span> / Atte</p>
+                  </div>
+                  
+                  <div className="bg-background p-4 rounded-lg border shadow-sm">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-bold text-foreground flex items-center"><BrainCircuit className="w-4 h-4 mr-2 text-primary" /> Model Confidence</span>
+                      <span className="text-sm font-bold text-primary">{data.confidence}%</span>
+                    </div>
+                    <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
+                      <div className={`h-full ${data.confidence > 85 ? 'bg-primary' : (data.confidence > 70 ? 'bg-yellow-500' : 'bg-red-500')}`} style={{ width: `${data.confidence}%` }}></div>
+                    </div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Prediction Reliability: <span className={data.confidence > 85 ? 'text-primary' : (data.confidence > 70 ? 'text-yellow-600' : 'text-red-500')}>{data.confidence > 85 ? 'High' : (data.confidence > 70 ? 'Medium' : 'Low')}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Side: Reasoning Checklist */}
+                <div className="bg-background p-5 rounded-lg border shadow-sm">
+                  <h3 className="font-bold text-lg mb-4 border-b pb-2 flex items-center">
+                    Why should I trust this?
+                  </h3>
+                  <ul className="space-y-3">
+                    {data.reasoning_bullets && data.reasoning_bullets.length > 0 ? (
+                      data.reasoning_bullets.map((bullet: string, idx: number) => (
+                        <li key={idx} className="flex items-start text-sm">
+                          <CheckCircle2 className="w-5 h-5 mr-3 text-green-500 shrink-0 mt-0.5" />
+                          <span className="text-muted-foreground font-medium leading-relaxed">{bullet}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="flex items-start text-sm text-muted-foreground">
+                        <AlertCircle className="w-5 h-5 mr-3 text-yellow-500 shrink-0 mt-0.5" />
+                        <span>Analyzed from historical BigQuery data and real-time market trends.</span>
+                      </li>
+                    )}
+                  </ul>
+                </div>
               </div>
               
               {/* Decision Factors Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div className="bg-background p-3 rounded-lg border text-center">
-                  <p className="text-xs text-muted-foreground">Price Trend</p>
-                  <p className="font-bold">{data.expected_increase > 0 ? "Positive" : data.expected_increase < 0 ? "Negative" : "Stable"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center">
-                  <p className="text-xs text-muted-foreground">Weather</p>
-                  <p className="font-bold">{data.weather.rain_probability < 50 ? "Favorable" : "Uncertain"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center">
-                  <p className="text-xs text-muted-foreground">Festival Demand</p>
-                  <p className="font-bold">{data.festival_demand || "Normal"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center flex flex-col justify-center">
-                  <p className="text-xs text-muted-foreground">AI Confidence</p>
-                  <p className="font-bold text-primary">{data.confidence}%</p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col bg-background p-4 rounded-lg border">
-                <div className="flex items-center mb-2">
-                  <span className="text-sm font-bold text-foreground mr-3">Confidence: {data.confidence}%</span>
-                  <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full ${data.confidence > 85 ? 'bg-primary' : 'bg-yellow-500'}`} style={{ width: `${data.confidence}%` }}></div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t">
+                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
+                    {data.expected_increase > 0 ? <TrendingUp className="w-4 h-4 mr-1 text-green-500"/> : data.expected_increase < 0 ? <TrendingDown className="w-4 h-4 mr-1 text-red-500"/> : <Minus className="w-4 h-4 mr-1 text-gray-500"/>} Price Trend
                   </div>
+                  <p className="font-bold text-sm">{data.expected_increase > 0 ? "Positive" : data.expected_increase < 0 ? "Negative" : "Stable"}</p>
                 </div>
-                <p className="text-sm text-muted-foreground italic">
-                  {data.confidence_reason || "Analyzed from historical BigQuery data and real-time market trends."}
-                </p>
+                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
+                    {data.weather.rain_probability < 50 ? <Sun className="w-4 h-4 mr-1 text-orange-500"/> : <CloudRain className="w-4 h-4 mr-1 text-blue-500"/>} Weather
+                  </div>
+                  <p className="font-bold text-sm">{data.weather.rain_probability < 50 ? "Favorable" : "Uncertain"}</p>
+                </div>
+                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
+                    <Activity className="w-4 h-4 mr-1 text-purple-500"/> Festival Demand
+                  </div>
+                  <p className="font-bold text-sm">{data.festival_demand || "Normal"}</p>
+                </div>
+                <div className="bg-background p-3 rounded-lg border text-center flex flex-col justify-center items-center">
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
+                    <BrainCircuit className="w-4 h-4 mr-1 text-primary"/> AI Confidence
+                  </div>
+                  <p className="font-bold text-sm text-primary">{data.confidence}%</p>
+                </div>
               </div>
             </CardContent>
           </Card>

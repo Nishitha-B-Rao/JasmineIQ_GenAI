@@ -59,6 +59,7 @@ def get_dashboard(variety: str = Query("Mallige"), today_price: int = Query(None
         "tomorrow_price": tomorrow,
         "recommendation": rec["recommendation"],
         "reason": rec["reason"],
+        "reasoning_bullets": rec.get("reasoning_bullets", []),
         "confidence": rec["confidence"],
         "confidence_reason": rec["confidence_reason"],
         "festival_demand": rec["festival_demand"],

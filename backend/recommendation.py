@@ -82,6 +82,14 @@ def get_recommendation(today_price: int, tomorrow_price: int, variety: str):
     if score >= 0:
         action = "WAIT"
         reason = f"Tomorrow's predicted market rate for {variety} is expected to change by ₹{price_diff} / Atte. "
+        
+        reasoning_bullets = [
+            f"Expected net gain: ₹{price_diff} / atte",
+            f"Weather expected to remain {'dry' if rain_probability < 40 else 'manageable'} ({100 - rain_probability}% confidence)",
+            f"Festival demand is currently {festival_demand.lower()}",
+            "Historical trends suggest a profitable hold" if festival_demand not in ["High", "Very High"] else "Upcoming festival demand is driving prices up"
+        ]
+        
         if rain_probability < 40:
             reason += "Weather conditions remain favorable, and "
         else:
@@ -94,6 +102,14 @@ def get_recommendation(today_price: int, tomorrow_price: int, variety: str):
     else:
         action = "SELL"
         reason = f"Tomorrow's predicted market rate for {variety} is expected to drop or stagnate (Change: ₹{price_diff} / Atte). "
+        
+        reasoning_bullets = [
+            f"Expected loss if delayed: ₹{abs(price_diff)} / atte",
+            f"High rain probability ({rain_probability}%) poses a significant risk to flower quality" if rain_probability > 50 else "Weather conditions are suboptimal",
+            f"Festival demand is {festival_demand.lower()}",
+            "Historical prices show a downward trend" if price_diff < 0 else "Market prices are stagnating"
+        ]
+        
         if rain_probability > 50:
             reason += f"High rain probability ({rain_probability}%) poses a significant risk to flower quality. "
         reason += "It is highly recommended to secure today's revenue."
@@ -101,6 +117,7 @@ def get_recommendation(today_price: int, tomorrow_price: int, variety: str):
     return {
         "recommendation": action,
         "reason": reason,
+        "reasoning_bullets": reasoning_bullets,
         "expected_increase": price_diff,
         "confidence": confidence,
         "festival_demand": festival_demand,
