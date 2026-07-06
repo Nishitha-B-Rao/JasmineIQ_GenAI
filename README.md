@@ -159,13 +159,5 @@ For full, foolproof deployment instructions to Google Cloud (Cloud Run), please 
 2. AI Farmer Alerts
    Deliver proactive alerts through WhatsApp or SMS.
 
-3. Enhanced AI Decision Intelligence
-   Multi-language support
-   Personalized recommendations
-   Better contextual reasoning
-
-4. Visual Quality Assessment
-   Allow farmers to upload photos of their harvest so the AI can assess flower quality (e.g., browning, bud size) and predict specific price variations.
-
-5. Market Proximity Mapping
-   Integrate an interactive map of nearby markets to help farmers identify the most profitable local selling point for the day.
+3. Assistant Performance Enhancement
+   Optimize the Gemini Assistant's latency, context caching, and response quality to provide even faster, more hyper-localized, and highly accurate answers to farmers.
