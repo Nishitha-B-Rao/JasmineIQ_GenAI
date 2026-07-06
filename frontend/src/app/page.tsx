@@ -102,8 +102,8 @@ export default function Dashboard() {
                     <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
                       <div className={`h-full ${data.confidence > 85 ? 'bg-primary' : (data.confidence > 70 ? 'bg-yellow-500' : 'bg-red-500')}`} style={{ width: `${data.confidence}%` }}></div>
                     </div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Prediction Reliability: <span className={data.confidence > 85 ? 'text-primary' : (data.confidence > 70 ? 'text-yellow-600' : 'text-red-500')}>{data.confidence > 85 ? 'High' : (data.confidence > 70 ? 'Medium' : 'Low')}</span>
+                    <p className="text-xs font-medium text-muted-foreground mt-3">
+                      <span className="font-bold">Reason:</span> {data.confidence_reason}
                     </p>
                   </div>
                 </div>

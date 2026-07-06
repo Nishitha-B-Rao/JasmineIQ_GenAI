@@ -20,9 +20,9 @@ export default function AnalyticsPage() {
   }, [])
 
   const comparisonData = data ? [
-    { name: "Average Price", Mallige: data.Mallige.avg, Jaaji: data.Jaaji.avg },
-    { name: "Highest Price", Mallige: data.Mallige.max, Jaaji: data.Jaaji.max },
-    { name: "Lowest Price", Mallige: data.Mallige.min, Jaaji: data.Jaaji.min }
+    { name: "Average", Mallige: data.Mallige.avg, Jaaji: data.Jaaji.avg },
+    { name: "Highest", Mallige: data.Mallige.max, Jaaji: data.Jaaji.max },
+    { name: "Lowest", Mallige: data.Mallige.min, Jaaji: data.Jaaji.min }
   ] : []
 
   const renderVolatilityIcon = (volatility: string) => {
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
-                    <XAxis dataKey="name" tick={{ fontSize: 14 }} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
                     <YAxis />
                     <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: "8px" }} />
                     <Legend />

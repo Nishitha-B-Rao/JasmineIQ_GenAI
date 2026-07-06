@@ -69,3 +69,27 @@ export function Sidebar() {
     </div>
   )
 }
+
+export function MobileNav() {
+  const pathname = usePathname()
+
+  return (
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t flex items-center justify-around z-50 px-2 pb-safe">
+      {routes.map((route) => (
+        <Link
+          key={route.href}
+          href={route.href}
+          className={cn(
+            "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+            pathname === route.href ? "text-primary" : "text-muted-foreground hover:text-primary"
+          )}
+        >
+          <route.icon className={cn("h-5 w-5", pathname === route.href ? "text-primary" : "text-muted-foreground")} />
+          <span className="text-[10px] font-medium tracking-tight truncate w-full text-center px-1">
+            {route.label}
+          </span>
+        </Link>
+      ))}
+    </div>
+  )
+}
