@@ -23,7 +23,7 @@ Here is a breakdown of why we chose each piece of our technology stack for Jasmi
 
 ### Google Gemini Flash (Generative AI)
 **Why we chose it:**
-- **Context-Aware Explanations**: Farmers don't just want a "SELL" or "WAIT" signal; they want to know *why*. Gemini is injected with live BigQuery analytics, the current weather, and the XGBoost prediction to generate natural, localized, and highly accurate explanations.
+- **Context-Aware Explanations**: Farmers don't just want a "SELL" or "WAIT" signal; they want to know *why*. Gemini is injected with live BigQuery analytics, the current weather, and the XGBoost prediction to generate natural, localized, and AI-powered explanations.
 - **Low Latency**: The "Flash" model was specifically chosen to ensure the chatbot responds instantly without making the user wait.
 
 ---

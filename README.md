@@ -1,6 +1,20 @@
 # JasmineIQ
 
+![Google Cloud](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![XGBoost](https://img.shields.io/badge/XGBoost-191A1B?style=for-the-badge)
+![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=google-gemini&logoColor=white)
+
 JasmineIQ is a decision-intelligence platform for Udupi Mallige and Jaaji cultivators. It combines historical market prices, weather data, and seasonal signals to help farmers make better selling decisions and reduce losses from perishability and market volatility.
+
+## Project at a Glance
+- **Historical Data**: 2018–2026
+- **Records**: 4,030
+- **Flower Varieties**: 2
+- **Forecast Horizon**: 7 Days
+- **Cloud Platform**: Google Cloud
+- **ML Model**: XGBoost
 
 ## Problem Statement
 
@@ -47,10 +61,10 @@ Google BigQuery stores historical market, weather, and festival data and support
 
 ### Offline Forecasting & Live Inference
 The XGBoost regressor is trained offline using historical BigQuery data (engineered with lag features, rolling windows, and seasonal signals). 
-At inference time, the model is fed real-time data: our live web scraper fetches today's price from The Canara Post on every page load, substituting it as the `Lag_1` feature to drastically improve tomorrow's prediction.
+At inference time, the model is fed real-time data: our live web scraper fetches today's price from The Canara Post on every page load, substituting it as the `Lag_1` feature, which helps improve the relevance of tomorrow's prediction using the latest available market price.
 
-### Live Data Ingestion (Web Scraping)
-The FastAPI backend uses BeautifulSoup to scrape live Udupi Jasmine prices from local news sources on every request. This ensures the dashboard is always up-to-date and self-sustaining day after day.
+### Real-Time Market Price Integration (Web Scraping)
+The FastAPI backend uses BeautifulSoup4 to scrape live Udupi Jasmine prices from local news sources on every request. This ensures the dashboard is always up-to-date and self-sustaining day after day.
 
 ### Explainable Recommendations
 Each recommendation includes the predicted price change, weather influence, festival impact, expected profit difference, and a confidence score.
@@ -145,5 +159,13 @@ For full, foolproof deployment instructions to Google Cloud (Cloud Run), please 
 2. AI Farmer Alerts
    Deliver proactive alerts through WhatsApp or SMS.
 
-3. Assistant Performance Enhancement
-   Optimize the Gemini Assistant's latency, context caching, and response quality to provide even faster, more hyper-localized, and highly accurate answers to farmers.
+3. Enhanced AI Decision Intelligence
+   Multi-language support
+   Personalized recommendations
+   Better contextual reasoning
+
+4. Visual Quality Assessment
+   Allow farmers to upload photos of their harvest so the AI can assess flower quality (e.g., browning, bud size) and predict specific price variations.
+
+5. Market Proximity Mapping
+   Integrate an interactive map of nearby markets to help farmers identify the most profitable local selling point for the day.

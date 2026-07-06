@@ -1,6 +1,6 @@
 # JasmineIQ: Model Architecture & Prediction Pipeline
 
-This document explains how JasmineIQ trains its forecasting model, how it ingests live market data via web scraping, and how it combines both to generate highly accurate, real-time price predictions.
+This document explains how JasmineIQ trains its forecasting model, how it ingests live market data via web scraping, and how it combines both to generate data-driven, real-time price predictions.
 
 ## 1. Model Training (Offline)
 
@@ -18,6 +18,11 @@ Flower prices are highly volatile and dependent on seasonality, festivals, and r
 
 ### Training & Export
 The XGBoost model is trained on these features to minimize forecasting error. Once trained, the model is serialized into a `.pkl` file (`jasmine_model.pkl`) using `joblib`. This allows the FastAPI backend to load the model instantly on startup without needing to retrain or heavily query the database on every request.
+
+### Model Evaluation
+To ensure the model generalizes well to unseen market conditions:
+- **Historical Records**: 4,030
+- **Evaluation**: 60-Day Holdout Validation
 
 ---
 
