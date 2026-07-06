@@ -1,0 +1,11 @@
+.env
+
+__pycache__/
+venv/
+.meteostat_cache/
+
+# Datasets and Models
+backend/data/
+backend/models/
+*.csv
+*.pkl

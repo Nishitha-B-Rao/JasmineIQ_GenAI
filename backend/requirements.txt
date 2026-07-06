@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+pandas
+scikit-learn
+xgboost
+google-genai
+pydantic
+python-multipart
+meteostat
+python-dotenv==1.0.1
+google-cloud-bigquery
+pandas-gbq
+db-dtypes
+joblib
+requests
+beautifulsoup4
+google-cloud-bigquery-storage
