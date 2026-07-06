@@ -44,7 +44,7 @@ This is where the offline model and the live scraper come together to create a p
 
 1. **Fetching the Baseline:** The user requests a forecast. The scraper instantly goes out to the internet and retrieves exactly what the flower is selling for *right now*.
 2. **Dynamic Feature Injection:** The backend takes this scraped live price and forcefully overrides the `Lag_1` feature in our model. It also dynamically updates the 7-day rolling average (`RollingMean7`) in memory. 
-3. **Forecasting:** The XGBoost model is fed this updated, real-time feature vector. Because the model now knows exactly what the market is doing *today*, its prediction for *tomorrow* becomes exponentially more accurate than if it were relying on stale dataset averages.
+3. **Forecasting:** The XGBoost model is fed this updated, real-time feature vector. Because the model now knows exactly what the market is doing *today*, it improves prediction relevance using the latest market observations rather than relying on stale dataset averages.
 4. **Decision Output:** The predicted tomorrow price is passed to the Decision Engine, which compares it against the scraped today price to calculate the `expected_increase` and generate a `SELL` or `WAIT` recommendation.
 
 ### Summary of the Data Flow

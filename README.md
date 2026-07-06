@@ -151,6 +151,13 @@ The frontend reads this value in `frontend/src/lib/api.ts` and uses it for all A
 
 For full, foolproof deployment instructions to Google Cloud (Cloud Run), please see `DEPLOYMENT.md`. It contains the exact copy-paste terminal commands needed to get both the backend and frontend live.
 
+## Hackathon Challenge Alignment: AI for Better Living
+
+JasmineIQ directly addresses the **Google Cloud Gen AI challenge** criteria:
+- **Predictive Analytics**: The XGBoost forecasting model predicts tomorrow's prices using historical trends, weather risk, and demand signals rather than relying on intuition.
+- **Explainable & Responsible AI**: The decision engine provides a deterministic, transparent Confidence Score (e.g., *82%*) backed by an explicit reason (e.g., *124 similar market conditions analyzed*). Farmers understand exactly *why* a decision is suggested, ensuring transparency and trust.
+- **Community Impact**: By converting raw data into actionable decision intelligence, the platform helps local agricultural communities maximize their income and reduce post-harvest losses due to perishability.
+
 ## Future Scope
 
 1. Regional Market Expansion
