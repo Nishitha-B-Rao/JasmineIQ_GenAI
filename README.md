@@ -146,4 +146,4 @@ For full, foolproof deployment instructions to Google Cloud (Cloud Run), please 
    Deliver proactive alerts through WhatsApp or SMS.
 
 3. Assistant Performance Enhancement
-   Optimize the Gemini Assistant's latency and context caching to provide even faster, more hyper-localized responses to farmers.
+   Optimize the Gemini Assistant's latency, context caching, and response quality to provide even faster, more hyper-localized, and highly accurate answers to farmers.
