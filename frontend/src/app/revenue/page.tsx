@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { fetchRevenue } from "@/lib/api"
+import { useLanguage } from "@/lib/LanguageContext"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Calculator, ArrowRight, IndianRupee, Info } from "lucide-react"
+import { Calculator, IndianRupee, Info } from "lucide-react"
 
 export default function RevenueCalculator() {
+  const { t } = useLanguage()
   const [variety, setVariety] = useState("Mallige")
   const [atte, setAtte] = useState<string>("10")
   const [data, setData] = useState<any>(null)
@@ -34,13 +36,13 @@ export default function RevenueCalculator() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight text-primary">Revenue Calculator</h2>
-        <p className="text-muted-foreground">Calculate your potential earnings and profit difference.</p>
+      <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+        <h2 className="text-3xl font-bold tracking-tight text-primary">{t("revenue.title")}</h2>
+        <p className="text-muted-foreground">{t("revenue.subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1">
+        <Card className="md:col-span-1 animate-in fade-in slide-in-from-left-4 duration-500 delay-100 fill-mode-both">
           <CardHeader>
             <CardTitle>Harvest Details</CardTitle>
           </CardHeader>
@@ -57,7 +59,7 @@ export default function RevenueCalculator() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium">Harvest Quantity (Atte)</label>
+              <label className="text-sm font-medium">{t("revenue.enter_atte")}</label>
               <Input 
                 type="number" 
                 value={atte} 
@@ -69,7 +71,7 @@ export default function RevenueCalculator() {
 
             <Button className="w-full" onClick={handleCalculate} disabled={loading}>
               <Calculator className="w-4 h-4 mr-2" />
-              {loading ? "Calculating..." : "Calculate Revenue"}
+              {loading ? t("common.loading") : t("revenue.calculate")}
             </Button>
 
             <div className="mt-4 p-3 bg-blue-50/50 text-blue-800 text-xs rounded-md border border-blue-100 flex items-start">
@@ -82,13 +84,13 @@ export default function RevenueCalculator() {
             </div>
             
             {data && (
-              <div className="pt-4 border-t space-y-2 mt-4">
+              <div className="pt-4 border-t space-y-2 mt-4 animate-in fade-in duration-300">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Equivalent Chendu:</span>
+                  <span className="text-muted-foreground">{t("revenue.equivalent")} {t("revenue.chendu")}:</span>
                   <span className="font-semibold">{data.equivalent_chendu.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Equivalent Flowers:</span>
+                  <span className="text-muted-foreground">{t("revenue.equivalent")} {t("revenue.flowers")}:</span>
                   <span className="font-semibold">{data.equivalent_flowers.toLocaleString()}</span>
                 </div>
               </div>
@@ -96,14 +98,14 @@ export default function RevenueCalculator() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 bg-muted/20 border-none shadow-inner">
+        <Card className="md:col-span-2 bg-muted/20 border-none shadow-inner animate-in fade-in slide-in-from-right-4 duration-500 delay-200 fill-mode-both">
           <CardContent className="p-6 h-full flex flex-col justify-center">
             {data ? (
-              <div className="space-y-8">
+              <div className="space-y-8 animate-in zoom-in-95 duration-300">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-card border shadow-sm">
                     <p className="text-sm text-muted-foreground mb-1">
-                      Selling Today
+                      {t("revenue.today")}
                       <span className="block text-xs opacity-70 mt-0.5">
                         {new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
                       </span>
@@ -115,7 +117,7 @@ export default function RevenueCalculator() {
                   </div>
                   <div className="p-4 rounded-xl bg-card border shadow-sm border-secondary/50">
                     <p className="text-sm text-muted-foreground mb-1">
-                      Selling Tomorrow <span className="text-xs opacity-70">(Predicted)</span>
+                      {t("revenue.tomorrow")} <span className="text-xs opacity-70">({t("common.estimated")})</span>
                       <span className="block text-xs opacity-70 mt-0.5">
                         {new Date(Date.now() + 86400000).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
                       </span>
@@ -128,7 +130,7 @@ export default function RevenueCalculator() {
                 </div>
 
                 <div className="p-6 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 text-center">
-                  <p className="text-lg font-medium text-foreground mb-2">Expected Profit Difference</p>
+                  <p className="text-lg font-medium text-foreground mb-2">{t("revenue.difference")}</p>
                   <p className={`text-4xl font-black flex items-center justify-center ${data.profit_difference === "XXX" ? "text-yellow-600" : (data.profit_difference >= 0 ? "text-green-600" : "text-red-500")}`}>
                     {data.profit_difference === "XXX" ? "" : (data.profit_difference >= 0 ? "+" : "-")}
                     <IndianRupee className="w-8 h-8 mx-1" />

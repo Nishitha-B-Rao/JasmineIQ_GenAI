@@ -66,10 +66,11 @@ We need to push your local CSV file into Google BigQuery so the ML model can rea
 We will deploy the FastAPI python server first.
 
 1. Make sure you are still inside the `backend` folder in your terminal.
-2. Run the deployment command. Replace `YOUR_GEMINI_API_KEY` and `YOUR_OPENWEATHER_API_KEY` with your actual keys.
+2. Run the deployment command. Replace `YOUR_OPENWEATHER_API_KEY` and `YOUR_PROJECT_ID` with your actual values.
    ```bash
-   gcloud run deploy jasmineiq-backend --source . --set-env-vars="GEMINI_API_KEY=YOUR_GEMINI_API_KEY,OPENWEATHER_API_KEY=YOUR_OPENWEATHER_API_KEY" --allow-unauthenticated --region=us-central1 --memory=1Gi
+   gcloud run deploy jasmineiq-backend --source . --set-env-vars="OPENWEATHER_API_KEY=YOUR_OPENWEATHER_API_KEY,GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1" --allow-unauthenticated --region=us-central1 --memory=1Gi --min-instances=1
    ```
+   > **Performance Note:** `--min-instances=1` keeps one instance warm at all times, eliminating the 5-10s cold start delay. This costs ~$5-10/month. Remove it if you want to stay within the free tier.
 3. **Wait for it to finish.** When it is done, the terminal will print a **Service URL** that looks like this:
    `https://jasmineiq-backend-xxxxx.a.run.app`
 4. **COPY THAT URL.** You need it for the next step.
@@ -80,13 +81,12 @@ We will deploy the FastAPI python server first.
 
 Now we deploy the Next.js UI, but first, we have to tell it where the backend is.
 
-1. Open the file `frontend/src/lib/api.ts` in your code editor.
-2. Find the line that says `const API_BASE = "http://localhost:8000/api"`.
-3. Change it to use the URL you copied in Phase 3. 
+1. Open the file `frontend/.env.local` in your code editor (or create it if it doesn't exist).
+2. Add the URL you copied in Phase 3 as an environment variable. 
    *(Make sure to add `/api` at the end!)*
    **Example:**
-   `const API_BASE = "https://jasmineiq-backend-xxxxx.a.run.app/api"`
-4. Save the file.
+   `NEXT_PUBLIC_API_URL=https://jasmineiq-backend-xxxxx.a.run.app/api`
+3. Save the file.
 5. In your terminal, navigate to the frontend folder:
    ```bash
    cd ../frontend

@@ -151,7 +151,7 @@ def get_analytics():
         mallige_row = df[df['Variety'] == 'Mallige'].iloc[0] if not df[df['Variety'] == 'Mallige'].empty else None
         jaaji_row = df[df['Variety'] == 'Jaaji'].iloc[0] if not df[df['Variety'] == 'Jaaji'].empty else None
         
-        return {
+        result = {
             "Mallige": {
                 "avg": int(mallige_row['avg']) if mallige_row is not None else 0,
                 "max": int(mallige_row['max']) if mallige_row is not None else 0,

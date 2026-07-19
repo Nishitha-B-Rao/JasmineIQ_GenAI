@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8000/api"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://jasmineiq-backend-586827445377.us-central1.run.app/api"
 
 export async function fetchDashboard(variety: string = "Mallige", todayPrice?: number) {
   let url = `${API_BASE}/dashboard?variety=${variety}`
@@ -28,11 +28,11 @@ export async function fetchAnalytics() {
   return res.json()
 }
 
-export async function chatWithAssistant(message: string, context?: unknown) {
+export async function chatWithAssistant(message: string, context?: unknown, language: string = "en", mode: string = "market") {
   const res = await fetch(`${API_BASE}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, context }),
+    body: JSON.stringify({ message, context, language, mode }),
   })
   if (!res.ok) throw new Error("Failed to fetch chat")
   return res.json()
