@@ -1,33 +1,72 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { fetchDashboard } from "@/lib/api"
+import { useState, useEffect, useCallback } from "react"
+import { useLanguage } from "@/lib/LanguageContext"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Input } from "@/components/ui/input"
-import { TrendingUp, TrendingDown, Minus, CloudRain, ThermometerSun, Wind, AlertCircle, Sun, CheckCircle2, Activity, BrainCircuit } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { TrendingUp, TrendingDown, Minus, CloudRain, ThermometerSun, Wind, AlertCircle, Sun, CheckCircle2, Activity, BrainCircuit, Info, Calendar } from "lucide-react"
 
 export default function Dashboard() {
+  const { t, locale } = useLanguage()
   const [variety, setVariety] = useState("Mallige")
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const loadDashboard = useCallback(() => {
+    let isActive = true
+    setLoading(true)
+    setError(null)
+    
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => {
+      if (isActive) controller.abort()
+    }, 15000)
+    
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://jasmineiq-backend-586827445377.us-central1.run.app/api"}/dashboard?variety=${variety}`, {
+      cache: "no-store",
+      signal: controller.signal
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch dashboard")
+        return res.json()
+      })
+      .then(data => {
+        if (isActive) setData(data)
+      })
+      .catch(err => {
+        if (!isActive) return // Ignore errors if component unmounted
+        if (err.name === 'AbortError') {
+          setError(t("common.timeout"))
+        } else {
+          setError(t("common.error"))
+        }
+        console.error(err)
+      })
+      .finally(() => {
+        clearTimeout(timeoutId)
+        if (isActive) setLoading(false)
+      })
+
+    return () => {
+      isActive = false
+      controller.abort()
+      clearTimeout(timeoutId)
+    }
+  }, [variety, t])
 
   useEffect(() => {
-    setLoading(true)
-    fetchDashboard(variety)
-      .then(setData)
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [variety])
+    const cleanup = loadDashboard()
+    return cleanup
+  }, [loadDashboard])
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-500">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">AI Decision Center</h2>
-          <p className="text-muted-foreground">Intelligent market recommendations for Udupi Jasmine cultivators.</p>
-          <p className="text-xs text-muted-foreground italic mt-1">* Note: The price shown is for the cultivator. Actual market price might vary.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-primary">{t("dashboard.title")}</h2>
+          <p className="text-muted-foreground">{t("dashboard.subtitle")}</p>
+          <p className="text-xs text-muted-foreground italic mt-1">{t("dashboard.note")}</p>
         </div>
         <div className="flex items-center space-x-4">
           <select 
@@ -43,26 +82,28 @@ export default function Dashboard() {
 
       {loading ? (
         <div className="space-y-6">
-          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-56 w-full" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1,2,3].map(i => <Skeleton key={i} className="h-32 w-full" />)}
+            {[1,2,3].map(i => <Skeleton key={i} className="h-40 w-full" />)}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1,2,3].map(i => <Skeleton key={i} className="h-48 w-full" />)}
           </div>
         </div>
       ) : data ? (
         <div className="space-y-6">
-          {/* Smart Alert (Only visible for large price swings) */}
+          
+          {/* Smart Alert */}
           {Math.abs(data.expected_increase) > 50 && (
-            <Card className="border-2 border-yellow-500 bg-yellow-500/10 mb-6">
+            <Card className="border-2 border-yellow-500 bg-yellow-500/10 mb-6 animate-in fade-in zoom-in-95 duration-500">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-bold flex items-center text-yellow-700">
-                  <AlertCircle className="w-5 h-5 mr-2" /> ⚠ Smart Alert
+                  <AlertCircle className="w-5 h-5 mr-2" /> ⚠ {t("dashboard.smart_alert")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-yellow-800 font-medium">
-                  {data.expected_increase > 0 
-                    ? "High demand expected tomorrow. Waiting is highly recommended." 
-                    : "Prices expected to decline significantly tomorrow. Secure your revenue today."}
+                  {data.expected_increase > 0 ? t("rec.high_demand") : t("rec.price_decline")}
                 </p>
                 <div className="mt-2 text-2xl font-black text-yellow-900">
                   Potential {data.expected_increase > 0 ? "Profit Increase" : "Loss if delayed"}: ₹{Math.abs(data.expected_increase)}
@@ -71,159 +112,168 @@ export default function Dashboard() {
             </Card>
           )}
 
-          {/* AI Recommendation Card At the Top */}
-          <Card className={`border-2 shadow-lg ${data.recommendation === 'WAIT' ? 'border-primary bg-primary/5' : 'border-destructive bg-destructive/5'}`}>
+          {/* AI Recommendation Card */}
+          <Card className={`border-2 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both ${data.recommendation === 'WAIT' ? 'border-primary bg-primary/5' : 'border-destructive bg-destructive/5'}`}>
             <CardHeader className="pb-2 border-b">
               <CardTitle className="flex items-center text-3xl font-bold justify-center md:justify-start">
                 {data.recommendation === 'WAIT' ? <TrendingUp className="w-8 h-8 mr-3 text-primary"/> : <AlertCircle className="w-8 h-8 mr-3 text-destructive"/>}
                 <span className={`font-black ${data.recommendation === 'WAIT' ? 'text-primary' : 'text-destructive'}`}>
-                  {data.recommendation === 'WAIT' ? '🟢 WAIT' : '🔴 SELL TODAY'}
+                  {data.recommendation === 'WAIT' ? t("rec.wait_full") : t("rec.sell_full")}
                 </span>
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 
-                {/* Left Side: Core Numbers & Confidence */}
+                {/* Left Side: Core Numbers */}
                 <div className="flex flex-col justify-center space-y-6">
                   <div className="text-center md:text-left">
-                    <p className="text-sm font-medium text-muted-foreground mb-1">Expected Profit Difference</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t("rec.profit_diff")}</p>
                     <p className={`text-5xl font-black ${data.expected_increase >= 0 ? "text-green-600" : "text-red-500"}`}>
                       {data.expected_increase >= 0 ? "+" : ""}₹{data.expected_increase}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-2">Tomorrow's Predicted Rate: <span className="font-bold text-foreground">₹{data.tomorrow_price}</span> / Atte</p>
+                    <p className="text-sm text-muted-foreground mt-2">{t("rec.tomorrow_rate")}: <span className="font-bold text-foreground">₹{data.tomorrow_price}</span> / {t("rec.per_atte")}</p>
                   </div>
                   
                   <div className="bg-background p-4 rounded-lg border shadow-sm">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-bold text-foreground flex items-center"><BrainCircuit className="w-4 h-4 mr-2 text-primary" /> Model Confidence</span>
+                      <span className="text-sm font-bold text-foreground flex items-center"><BrainCircuit className="w-4 h-4 mr-2 text-primary" /> {t("rec.confidence")}</span>
                       <span className="text-sm font-bold text-primary">{data.confidence}%</span>
                     </div>
                     <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-2">
                       <div className={`h-full ${data.confidence > 85 ? 'bg-primary' : (data.confidence > 70 ? 'bg-yellow-500' : 'bg-red-500')}`} style={{ width: `${data.confidence}%` }}></div>
                     </div>
-                    <p className="text-xs font-medium text-muted-foreground mt-3">
-                      <span className="font-bold">Reason:</span> {data.confidence_reason}
-                    </p>
                   </div>
                 </div>
 
-                {/* Right Side: Reasoning Checklist */}
+                {/* Right Side: Confidence Factors Checklist */}
                 <div className="bg-background p-5 rounded-lg border shadow-sm">
                   <h3 className="font-bold text-lg mb-4 border-b pb-2 flex items-center">
-                    Why should I trust this?
+                    {t("rec.why_trust")}
                   </h3>
                   <ul className="space-y-3">
-                    {data.reasoning_bullets && data.reasoning_bullets.length > 0 ? (
-                      data.reasoning_bullets.map((bullet: string, idx: number) => (
-                        <li key={idx} className="flex items-start text-sm">
-                          <CheckCircle2 className="w-5 h-5 mr-3 text-green-500 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground font-medium leading-relaxed">{bullet}</span>
-                        </li>
-                      ))
-                    ) : (
-                      <li className="flex items-start text-sm text-muted-foreground">
-                        <AlertCircle className="w-5 h-5 mr-3 text-yellow-500 shrink-0 mt-0.5" />
-                        <span>Analyzed from historical BigQuery data and real-time market trends.</span>
+                    {data.confidence_factors && data.confidence_factors.map((factor: any, idx: number) => (
+                      <li key={idx} className="flex items-start text-sm">
+                        {factor.status === 'pass' && <CheckCircle2 className="w-5 h-5 mr-3 text-green-500 shrink-0 mt-0.5" />}
+                        {factor.status === 'warn' && <AlertCircle className="w-5 h-5 mr-3 text-yellow-500 shrink-0 mt-0.5" />}
+                        {factor.status === 'fail' && <AlertCircle className="w-5 h-5 mr-3 text-red-500 shrink-0 mt-0.5" />}
+                        {factor.status === 'neutral' && <Minus className="w-5 h-5 mr-3 text-gray-400 shrink-0 mt-0.5" />}
+                        <div>
+                          <span className="font-semibold">{t(`factors.${factor.name.toLowerCase().replace(' ', '_')}`) || factor.name}: </span>
+                          <span className="text-muted-foreground">{factor.detail}</span>
+                        </div>
                       </li>
-                    )}
+                    ))}
                   </ul>
-                </div>
-              </div>
-              
-              {/* Decision Factors Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t">
-                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
-                  <div className="flex items-center text-xs text-muted-foreground mb-2">
-                    {data.expected_increase > 0 ? <TrendingUp className="w-4 h-4 mr-1 text-green-500"/> : data.expected_increase < 0 ? <TrendingDown className="w-4 h-4 mr-1 text-red-500"/> : <Minus className="w-4 h-4 mr-1 text-gray-500"/>} Price Trend
-                  </div>
-                  <p className="font-bold text-sm">{data.expected_increase > 0 ? "Positive" : data.expected_increase < 0 ? "Negative" : "Stable"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
-                  <div className="flex items-center text-xs text-muted-foreground mb-2">
-                    {data.weather.rain_probability < 50 ? <Sun className="w-4 h-4 mr-1 text-orange-500"/> : <CloudRain className="w-4 h-4 mr-1 text-blue-500"/>} Weather
-                  </div>
-                  <p className="font-bold text-sm">{data.weather.rain_probability < 50 ? "Favorable" : "Uncertain"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center flex flex-col items-center justify-center">
-                  <div className="flex items-center text-xs text-muted-foreground mb-2">
-                    <Activity className="w-4 h-4 mr-1 text-purple-500"/> Festival Demand
-                  </div>
-                  <p className="font-bold text-sm">{data.festival_demand || "Normal"}</p>
-                </div>
-                <div className="bg-background p-3 rounded-lg border text-center flex flex-col justify-center items-center">
-                  <div className="flex items-center text-xs text-muted-foreground mb-2">
-                    <BrainCircuit className="w-4 h-4 mr-1 text-primary"/> AI Confidence
-                  </div>
-                  <p className="font-bold text-sm text-primary">{data.confidence}%</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Metrics Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+          {/* Core Metrics Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
             <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Today's Live Rate
-                  <span className="block text-xs opacity-70 mt-0.5">
-                    {new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </span>
+                <CardTitle className="text-sm font-medium text-muted-foreground flex justify-between">
+                  {t("price.today_live")}
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">{data.is_live ? t("common.live") : t("common.estimated")}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold">₹{data.today_price}</div>
-                <p className="text-sm text-muted-foreground mt-1">per Atte</p>
+                <p className="text-sm text-muted-foreground mt-1">{t("rec.per_atte")}</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-secondary/30 to-transparent border-secondary/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Tomorrow's Predicted Rate
-                  <span className="block text-xs opacity-70 mt-0.5">
-                    {new Date(Date.now() + 86400000).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </span>
+                <CardTitle className="text-sm font-medium text-muted-foreground flex justify-between">
+                  {t("price.tomorrow_predicted")}
+                  <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">{t("common.estimated")}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold">₹{data.tomorrow_price}</div>
-                <p className="text-sm text-muted-foreground mt-1">per Atte</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
-                  <CloudRain className="w-4 h-4 mr-2" /> Weather Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col justify-center h-full pb-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col items-center">
-                    <ThermometerSun className="w-6 h-6 text-orange-500 mb-1"/> 
-                    <span className="font-bold">{data.weather.temperature}°C</span>
-                    <span className="text-xs text-muted-foreground mt-1">Temp</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <CloudRain className="w-6 h-6 text-blue-500 mb-1"/> 
-                    <span className="font-bold">{data.weather.rain_probability}%</span>
-                    <span className="text-xs text-muted-foreground mt-1">Rain Prob</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <Wind className="w-6 h-6 text-gray-500 mb-1"/> 
-                    <span className="font-bold">{data.weather.humidity}%</span>
-                    <span className="text-xs text-muted-foreground mt-1">Humidity</span>
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground mt-1">{t("rec.per_atte")}</p>
               </CardContent>
             </Card>
           </div>
+
+          {/* Intelligence Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+            {/* Market Trend */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+                  <Activity className="w-4 h-4 mr-2" /> {t("trend.title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col justify-center">
+                <div className="flex items-center space-x-2">
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                    data.market_trend?.direction === 'bullish' ? 'bg-green-100 text-green-800' :
+                    data.market_trend?.direction === 'bearish' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {data.market_trend?.direction === 'bullish' ? '🟢' : data.market_trend?.direction === 'bearish' ? '🔴' : '🟡'} {data.market_trend?.label}
+                  </span>
+                </div>
+                <div className="mt-3 text-2xl font-bold">
+                  {data.market_trend?.change_percent > 0 ? '+' : ''}{data.market_trend?.change_percent}%
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Expected change</p>
+              </CardContent>
+            </Card>
+
+            {/* Weather Impact */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+                  <CloudRain className="w-4 h-4 mr-2" /> {t("weather.impact")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-primary">{data.weather.price_impact}</div>
+                <p className="text-xs text-muted-foreground mt-1 font-medium">{t("weather.price_impact")}</p>
+                <p className="text-xs text-muted-foreground mt-2 border-t pt-2 line-clamp-2">
+                  {data.weather.price_impact_reason}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Today's Insights */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+                  <Info className="w-4 h-4 mr-2" /> {t("insights.title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {data.insights?.slice(0, 3).map((insight: string, idx: number) => (
+                    <li key={idx} className="flex items-start text-xs text-muted-foreground">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2 mt-1.5 shrink-0" />
+                      {insight}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+
+          
         </div>
       ) : (
-        <div className="text-center text-destructive">Failed to load data. Ensure backend is running.</div>
+        <div className="text-center py-12 space-y-4">
+          <p className="text-destructive font-medium">{error || t("common.error")}</p>
+          <button
+            onClick={loadDashboard}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+          >
+            {t("common.retry")}
+          </button>
+        </div>
       )}
     </div>
   )

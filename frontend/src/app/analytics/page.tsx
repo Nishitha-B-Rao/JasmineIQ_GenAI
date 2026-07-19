@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { fetchAnalytics } from "@/lib/api"
+import { useLanguage } from "@/lib/LanguageContext"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { BarChart3, TrendingDown, TrendingUp, Activity, Leaf, AlertTriangle, MinusCircle, CheckCircle, BrainCircuit } from "lucide-react"
+import { BarChart3, TrendingDown, TrendingUp, AlertTriangle, MinusCircle, CheckCircle, BrainCircuit, Leaf } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 export default function AnalyticsPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -20,9 +22,9 @@ export default function AnalyticsPage() {
   }, [])
 
   const comparisonData = data ? [
-    { name: "Average", Mallige: data.Mallige.avg, Jaaji: data.Jaaji.avg },
-    { name: "Highest", Mallige: data.Mallige.max, Jaaji: data.Jaaji.max },
-    { name: "Lowest", Mallige: data.Mallige.min, Jaaji: data.Jaaji.min }
+    { name: t("analytics.avg"), Mallige: data.Mallige.avg, Jaaji: data.Jaaji.avg },
+    { name: t("analytics.max"), Mallige: data.Mallige.max, Jaaji: data.Jaaji.max },
+    { name: t("analytics.min"), Mallige: data.Mallige.min, Jaaji: data.Jaaji.min }
   ] : []
 
   const renderVolatilityIcon = (volatility: string) => {
@@ -33,11 +35,11 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <div>
+      <div className="animate-in fade-in slide-in-from-top-4 duration-500">
         <h2 className="text-3xl font-bold tracking-tight text-primary flex items-center">
-          <BarChart3 className="w-8 h-8 mr-2" /> BigQuery Market Analytics
+          <BarChart3 className="w-8 h-8 mr-2" /> {t("analytics.title")}
         </h2>
-        <p className="text-muted-foreground">Deep dive into historical trends and variety comparisons powered by Google BigQuery.</p>
+        <p className="text-muted-foreground">{t("analytics.subtitle")}</p>
       </div>
 
       {loading ? (
@@ -49,7 +51,7 @@ export default function AnalyticsPage() {
         <div className="space-y-8">
           
           {/* AI Insight Summary */}
-          <Card className="border-2 border-primary/20 bg-primary/5 shadow-sm">
+          <Card className="border-2 border-primary/20 bg-primary/5 shadow-sm animate-in fade-in zoom-in-95 duration-500 delay-100 fill-mode-both">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-bold flex items-center text-primary">
                 <BrainCircuit className="w-5 h-5 mr-2" /> AI Market Insight
@@ -62,7 +64,7 @@ export default function AnalyticsPage() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
             
             {/* Mallige Card */}
             <Card className="border-t-4 border-t-primary shadow-sm">
@@ -73,19 +75,19 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 <div className="p-4 bg-muted/30 rounded-lg border">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingUp className="w-4 h-4 mr-1 text-green-500"/> Highest Historical</p>
-                  <p className="text-2xl font-bold">₹{data.Mallige.max} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingUp className="w-4 h-4 mr-1 text-green-500"/> {t("analytics.max")}</p>
+                  <p className="text-2xl font-bold">₹{data.Mallige.max} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg border">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingDown className="w-4 h-4 mr-1 text-red-500"/> Lowest Historical</p>
-                  <p className="text-2xl font-bold">₹{data.Mallige.min} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingDown className="w-4 h-4 mr-1 text-red-500"/> {t("analytics.min")}</p>
+                  <p className="text-2xl font-bold">₹{data.Mallige.min} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg border">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1">Historical Average</p>
-                  <p className="text-2xl font-bold">₹{data.Mallige.avg} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1">{t("analytics.avg")}</p>
+                  <p className="text-2xl font-bold">₹{data.Mallige.avg} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-muted/30 rounded-lg border">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1">Market Volatility</p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1">{t("analytics.volatility")}</p>
                   <p className="text-xl font-bold flex items-center">
                     {renderVolatilityIcon(data.Mallige.volatility)} {data.Mallige.volatility}
                   </p>
@@ -102,19 +104,19 @@ export default function AnalyticsPage() {
               </CardHeader>
               <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                 <div className="p-4 bg-card rounded-lg border shadow-sm">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingUp className="w-4 h-4 mr-1 text-green-500"/> Highest Historical</p>
-                  <p className="text-2xl font-bold">₹{data.Jaaji.max} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingUp className="w-4 h-4 mr-1 text-green-500"/> {t("analytics.max")}</p>
+                  <p className="text-2xl font-bold">₹{data.Jaaji.max} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-card rounded-lg border shadow-sm">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingDown className="w-4 h-4 mr-1 text-red-500"/> Lowest Historical</p>
-                  <p className="text-2xl font-bold">₹{data.Jaaji.min} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1"><TrendingDown className="w-4 h-4 mr-1 text-red-500"/> {t("analytics.min")}</p>
+                  <p className="text-2xl font-bold">₹{data.Jaaji.min} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-card rounded-lg border shadow-sm">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1">Historical Average</p>
-                  <p className="text-2xl font-bold">₹{data.Jaaji.avg} <span className="text-sm font-normal text-muted-foreground">/ Atte</span></p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1">{t("analytics.avg")}</p>
+                  <p className="text-2xl font-bold">₹{data.Jaaji.avg} <span className="text-sm font-normal text-muted-foreground">/ {t("rec.per_atte")}</span></p>
                 </div>
                 <div className="p-4 bg-card rounded-lg border shadow-sm">
-                  <p className="text-xs text-muted-foreground flex items-center mb-1">Market Volatility</p>
+                  <p className="text-xs text-muted-foreground flex items-center mb-1">{t("analytics.volatility")}</p>
                   <p className="text-xl font-bold flex items-center">
                     {renderVolatilityIcon(data.Jaaji.volatility)} {data.Jaaji.volatility}
                   </p>
@@ -124,7 +126,7 @@ export default function AnalyticsPage() {
 
           </div>
 
-          <Card className="shadow-md border-muted">
+          <Card className="shadow-md border-muted animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
             <CardHeader>
               <CardTitle>Mallige vs Jaaji Comparison</CardTitle>
             </CardHeader>
@@ -146,7 +148,7 @@ export default function AnalyticsPage() {
           </Card>
         </div>
       ) : (
-        <div className="text-center text-destructive">Failed to load analytics data.</div>
+        <div className="text-center text-destructive">{t("common.error")}</div>
       )}
     </div>
   )

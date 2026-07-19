@@ -72,8 +72,14 @@ Each recommendation includes the predicted price change, weather influence, fest
 ### Interactive Dashboards
 The frontend shows market analytics and forecast charts using Recharts.
 
-### Gemini Farming Assistant
-The assistant uses Gemini Flash to turn analytics into concise, farmer-friendly explanations.
+### Multilingual & Localized (i18n)
+Full support for English and Kannada (ಕನ್ನಡ) ensuring accessibility for local Udupi farmers.
+
+### Sustainable Farming Hub
+A dedicated module guiding farmers on how to turn unsold, wilted Jasmine into valuable compost, natural dyes, and essential oils, minimizing economic loss.
+
+### AI Farming Assistant
+The assistant uses Google Cloud Vertex AI to turn analytics into concise, farmer-friendly explanations.
 
 ## Tech Stack
 
@@ -126,9 +132,9 @@ uvicorn main:app --reload
 Create `backend/.env` with the required keys before running the API:
 
 ```env
-GEMINI_API_KEY=your_key_here
 OPENWEATHER_API_KEY=your_key_here
 GOOGLE_CLOUD_PROJECT=your_project_id
+GOOGLE_CLOUD_LOCATION=us-central1
 ```
 
 ### Frontend
